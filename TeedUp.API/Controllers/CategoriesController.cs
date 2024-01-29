@@ -4,6 +4,7 @@ using TeedUp.API.Data;
 using TeedUp.API.Models.Domain;
 using TeedUp.API.Models.DTO;
 using TeedUp.API.Repositories.Interface;
+using TeedUp.API.Repositories.Service;
 
 namespace TeedUp.API.Controllers
 {
@@ -41,8 +42,7 @@ namespace TeedUp.API.Controllers
 			return Ok(response);
 		}
 
-
-		//GET: https://localhost:7079/api/Categories 
+		//GET: https://localhost:7079/api/Categories
 		[HttpGet]
 		public async Task<IActionResult> GetAllCategories()
 		{
@@ -50,7 +50,7 @@ namespace TeedUp.API.Controllers
 
 			//map domain model to dto
 			var response = new List<CategoryDTO>();
-			foreach(var category in categories)
+			foreach (var category in categories)
 			{
 				response.Add(new CategoryDTO
 				{
@@ -70,7 +70,7 @@ namespace TeedUp.API.Controllers
 		{
 			var existingRecord = await categoryRepository.GetByIdAsync(id);
 
-			if (existingRecord == null) 
+			if (existingRecord == null)
 				return NotFound();
 
 			var response = new CategoryDTO
@@ -79,6 +79,55 @@ namespace TeedUp.API.Controllers
 				Name = existingRecord.Name,
 				UrlHandle = existingRecord.UrlHandle
 			};
+			return Ok(response);
+		}
+
+		//PUT: https://localhost:7079/api/Categories/{id}
+		[HttpPut]
+		[Route("{id:Guid}")]
+		public async Task<IActionResult> EditCategory([FromRoute] Guid id, UpdateCategoryRequestDTO request)
+		{
+			//convert DTO to domain model
+			var category = new Category
+			{
+				Id = id,
+				Name = request.Name,
+				UrlHandle = request.UrlHandle
+			};
+
+			category = await categoryRepository.UpdateAsync(category);
+
+			if (category == null)
+				return NotFound();
+
+			//convert domain model to DTO
+			var response = new CategoryDTO
+			{
+				Id = category.Id,
+				Name = category.Name,
+				UrlHandle = category.UrlHandle
+			};
+
+			return Ok(response);
+		}
+
+		//DELETE: https://localhost:7079/api/Categories/{id}
+		[HttpDelete]
+		[Route("{id:Guid}")]
+		public async Task<IActionResult> DeleteCategory([FromRoute] Guid id)
+		{
+			var category = await categoryRepository.DeleteAsync(id);
+
+			if (category == null) return NotFound();
+
+			//convert domain model to dto
+			var response = new CategoryDTO
+			{
+				Id = category.Id,
+				Name = category.Name,
+				UrlHandle = category.UrlHandle
+			};
+
 			return Ok(response);
 		}
 	}

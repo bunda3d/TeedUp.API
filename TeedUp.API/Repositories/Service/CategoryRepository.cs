@@ -22,6 +22,18 @@ namespace TeedUp.API.Repositories.Service
 			return category;
 		}
 
+		public async Task<Category?> DeleteAsync(Guid id)
+		{
+			var existingRecord = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+
+			if (existingRecord == null)
+				return null;
+
+			_context.Categories.Remove(existingRecord);
+			await _context.SaveChangesAsync();
+			return existingRecord;
+		}
+
 		public async Task<IEnumerable<Category>> GetAllAsync()
 		{
 			return await _context.Categories.ToListAsync();
@@ -30,6 +42,19 @@ namespace TeedUp.API.Repositories.Service
 		public async Task<Category?> GetByIdAsync(Guid id)
 		{
 			return await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+		}
+
+		public async Task<Category?> UpdateAsync(Category category)
+		{
+			var existingRecord = await _context.Categories.FirstOrDefaultAsync(x => x.Id == category.Id);
+
+			if (existingRecord != null)
+			{
+				_context.Entry(existingRecord).CurrentValues.SetValues(category);
+				await _context.SaveChangesAsync();
+				return category;
+			}
+			return null;
 		}
 	}
 }
