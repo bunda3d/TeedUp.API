@@ -21,5 +21,15 @@ namespace TeedUp.API.Repositories.Service
 
 			return category;
 		}
+
+		public async Task<IEnumerable<Category>> GetAllAsync()
+		{
+			return await _context.Categories.ToListAsync();
+		}
+
+		public async Task<Category?> GetByIdAsync(Guid id)
+		{
+			return await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+		}
 	}
 }

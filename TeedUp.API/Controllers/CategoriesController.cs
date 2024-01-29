@@ -19,7 +19,7 @@ namespace TeedUp.API.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> CreateCategory(CreateCategoryRequestDTO request)
+		public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryRequestDTO request)
 		{
 			//map dto to domain model
 			var category = new Category
@@ -38,6 +38,47 @@ namespace TeedUp.API.Controllers
 				UrlHandle = category.UrlHandle
 			};
 
+			return Ok(response);
+		}
+
+
+		//GET: https://localhost:7079/api/Categories 
+		[HttpGet]
+		public async Task<IActionResult> GetAllCategories()
+		{
+			var categories = await categoryRepository.GetAllAsync();
+
+			//map domain model to dto
+			var response = new List<CategoryDTO>();
+			foreach(var category in categories)
+			{
+				response.Add(new CategoryDTO
+				{
+					Id = category.Id,
+					Name = category.Name,
+					UrlHandle = category.UrlHandle
+				});
+			}
+
+			return Ok(response);
+		}
+
+		//GET: https://localhost:7079/api/Categories/{id}
+		[HttpGet]
+		[Route("{id:Guid}")]
+		public async Task<IActionResult> GetCategoryById([FromRoute] Guid id)
+		{
+			var existingRecord = await categoryRepository.GetByIdAsync(id);
+
+			if (existingRecord == null) 
+				return NotFound();
+
+			var response = new CategoryDTO
+			{
+				Id = existingRecord.Id,
+				Name = existingRecord.Name,
+				UrlHandle = existingRecord.UrlHandle
+			};
 			return Ok(response);
 		}
 	}
