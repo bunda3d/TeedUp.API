@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using TeedUp.API.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using TeedUp.API.Models.Domain;
-using TeedUp.API.Models.DTO;
+using TeedUp.API.Models.DTO.Category;
 using TeedUp.API.Repositories.Interface;
-using TeedUp.API.Repositories.Service;
 
 namespace TeedUp.API.Controllers
 {

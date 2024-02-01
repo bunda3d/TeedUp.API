@@ -1,4 +1,4 @@
-﻿namespace TeedUp.API.Models.DTO
+﻿namespace TeedUp.API.Models.DTO.Category
 {
 	public class UpdateCategoryRequestDTO
 	{

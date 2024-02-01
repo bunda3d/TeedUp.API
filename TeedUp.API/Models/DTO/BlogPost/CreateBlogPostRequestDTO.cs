@@ -1,8 +1,7 @@
-﻿namespace TeedUp.API.Models.Domain
+﻿namespace TeedUp.API.Models.DTO.BlogPost
 {
-	public class BlogPost
+	public class CreateBlogPostRequestDTO
 	{
-		public Guid Id { get; set; }
 		public string Title { get; set; }
 		public string ShortDescription { get; set; }
 		public string Content { get; set; }
