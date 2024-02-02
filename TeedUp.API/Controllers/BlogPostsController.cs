@@ -55,5 +55,33 @@ namespace TeedUp.API.Controllers
 
 			return Ok(response);
 		}
+
+		//GET: {apibaseurl}/api/blogposts
+		[HttpGet]
+		public async Task<IActionResult> GetAllBlogPosts()
+		{
+			var blogPosts = await blogPostRepository.GetAllAsync();
+
+			//convert domain model to dto
+			var response = new List<BlogPostDTO>();
+			foreach(var blogPost in blogPosts)
+			{
+				response.Add(new BlogPostDTO
+				{
+					Id = blogPost.Id,
+					Author = blogPost.Author,
+					Content = blogPost.Content,
+					DatePublished = blogPost.DatePublished,
+					DateUpdated = blogPost.DateUpdated,
+					FeaturedImageUrl = blogPost.FeaturedImageUrl,
+					IsVisible = blogPost.IsVisible,
+					ShortDescription = blogPost.ShortDescription,
+					Title = blogPost.Title,
+					UrlHandle = blogPost.UrlHandle
+				});
+			}
+
+			return Ok(response);
+		}
 	}
 }

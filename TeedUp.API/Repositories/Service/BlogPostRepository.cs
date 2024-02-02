@@ -1,4 +1,5 @@
-﻿using TeedUp.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TeedUp.API.Data;
 using TeedUp.API.Models.Domain;
 using TeedUp.API.Repositories.Interface;
 
@@ -18,6 +19,11 @@ namespace TeedUp.API.Repositories.Service
 			await _context.BlogPosts.AddAsync(blogPost);
 			await _context.SaveChangesAsync();
 			return blogPost;
+		}
+
+		public async Task<IEnumerable<BlogPost>> GetAllAsync()
+		{
+			return await _context.BlogPosts.ToListAsync();
 		}
 	}
 }
