@@ -23,7 +23,31 @@ namespace TeedUp.API.Repositories.Service
 
 		public async Task<IEnumerable<BlogPost>> GetAllAsync()
 		{
-			return await _context.BlogPosts.ToListAsync();
+			return await _context.BlogPosts.Include(x => x.Categories).ToListAsync();
+		}
+
+		public async Task<BlogPost?> GetByIdAsync(Guid id)
+		{
+			//include categories
+			return await _context.BlogPosts.Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == id);
+		}
+
+		public async Task<BlogPost?> UpdateAsync(BlogPost blogPost)
+		{
+			var existingBlogPost = await _context.BlogPosts
+				.Include(x=>x.Categories)
+				.FirstOrDefaultAsync(x => x.Id == blogPost.Id);
+
+			if (existingBlogPost == null) 
+				return null;
+
+			//update blog post
+			_context.Entry(existingBlogPost).CurrentValues.SetValues(blogPost);
+			//update categories
+			existingBlogPost.Categories = blogPost.Categories;
+			await _context.SaveChangesAsync();
+
+			return blogPost;
 		}
 	}
 }

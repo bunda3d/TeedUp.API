@@ -1,4 +1,6 @@
-﻿namespace TeedUp.API.Models.DTO.BlogPost
+﻿using TeedUp.API.Models.DTO.Category;
+
+namespace TeedUp.API.Models.DTO.BlogPost
 {
 	public class BlogPostDTO
 	{
@@ -12,5 +14,7 @@
 		public DateTime DateUpdated { get; set; }
 		public string Author { get; set; }
 		public bool IsVisible { get; set; }
+
+		public List<CategoryDTO> Categories { get; set; } = new List<CategoryDTO>();
 	}
 }

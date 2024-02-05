@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TeedUp.API.Models.Domain;
-using TeedUp.API.Models.DTO;
 using TeedUp.API.Models.DTO.BlogPost;
+using TeedUp.API.Models.DTO.Category;
 using TeedUp.API.Repositories.Interface;
 
 namespace TeedUp.API.Controllers
@@ -12,10 +11,15 @@ namespace TeedUp.API.Controllers
 	public class BlogPostsController : ControllerBase
 	{
 		private readonly IBlogPostRepository blogPostRepository;
+		private readonly ICategoryRepository categoryRepository;
 
-		public BlogPostsController(IBlogPostRepository blogPostRepository)
+		public BlogPostsController(
+			IBlogPostRepository blogPostRepository,
+			ICategoryRepository categoryRepository
+		)
 		{
 			this.blogPostRepository = blogPostRepository;
+			this.categoryRepository = categoryRepository;
 		}
 
 		//POST: {apibaseurl}/api/blogposts
@@ -34,7 +38,17 @@ namespace TeedUp.API.Controllers
 				ShortDescription = request.ShortDescription,
 				Title = request.Title,
 				UrlHandle = request.UrlHandle,
+				Categories = new List<Category>()
 			};
+
+			foreach (var categoryGuid in request.Categories)
+			{
+				var existingCategory = await categoryRepository.GetByIdAsync(categoryGuid);
+				if (existingCategory != null)
+				{
+					blogPost.Categories.Add(existingCategory);
+				}
+			}
 
 			await blogPostRepository.CreateAsync(blogPost);
 
@@ -50,7 +64,13 @@ namespace TeedUp.API.Controllers
 				IsVisible = blogPost.IsVisible,
 				ShortDescription = blogPost.ShortDescription,
 				Title = blogPost.Title,
-				UrlHandle = blogPost.UrlHandle
+				UrlHandle = blogPost.UrlHandle,
+				Categories = blogPost.Categories.Select(x => new CategoryDTO
+				{
+					Id = x.Id,
+					Name = x.Name,
+					UrlHandle = x.UrlHandle
+				}).ToList()
 			};
 
 			return Ok(response);
@@ -64,7 +84,7 @@ namespace TeedUp.API.Controllers
 
 			//convert domain model to dto
 			var response = new List<BlogPostDTO>();
-			foreach(var blogPost in blogPosts)
+			foreach (var blogPost in blogPosts)
 			{
 				response.Add(new BlogPostDTO
 				{
@@ -77,11 +97,116 @@ namespace TeedUp.API.Controllers
 					IsVisible = blogPost.IsVisible,
 					ShortDescription = blogPost.ShortDescription,
 					Title = blogPost.Title,
-					UrlHandle = blogPost.UrlHandle
+					UrlHandle = blogPost.UrlHandle,
+					Categories = blogPost.Categories.Select(x => new CategoryDTO
+					{
+						Id = x.Id,
+						Name = x.Name,
+						UrlHandle = x.UrlHandle
+					}).ToList()
 				});
 			}
 
 			return Ok(response);
+		}
+
+		//GET: {apibaseurl}/api/blogposts/{id}
+		[HttpGet]
+		[Route("{id:Guid}")]
+		public async Task<IActionResult> GetBlogPostById([FromRoute] Guid id)
+		{
+			var blogPost = await blogPostRepository.GetByIdAsync(id);
+
+			if (blogPost is null)
+			{
+				return NotFound();
+			}
+			
+			//convert domain model to dto
+			var response = new BlogPostDTO
+			{
+				Id = blogPost.Id,
+				Author = blogPost.Author,
+				Content = blogPost.Content,
+				DatePublished = blogPost.DatePublished,
+				DateUpdated = blogPost.DateUpdated,
+				FeaturedImageUrl = blogPost.FeaturedImageUrl,
+				IsVisible = blogPost.IsVisible,
+				ShortDescription = blogPost.ShortDescription,
+				Title = blogPost.Title,
+				UrlHandle = blogPost.UrlHandle,
+				Categories = blogPost.Categories.Select(x => new CategoryDTO
+				{
+					Id = x.Id,
+					Name = x.Name,
+					UrlHandle = x.UrlHandle
+				}).ToList()
+			};
+
+			return Ok(response);
+
+		}
+
+		//PUT: {apibaseurl}/api/blogposts/{id}
+		[HttpPut]
+		[Route("{id:Guid}")]
+		public async Task<IActionResult> UpdateBlogPostById([FromRoute] Guid id, UpdateBlogPostRequestDTO request)
+		{
+			//convert from dto to domain model
+			var blogPost = new BlogPost
+			{
+				Id = id,
+				Author = request.Author,
+				Content = request.Content,
+				DatePublished = request.DatePublished,
+				DateUpdated = request.DateUpdated,
+				FeaturedImageUrl = request.FeaturedImageUrl,
+				IsVisible = request.IsVisible,
+				ShortDescription = request.ShortDescription,
+				Title = request.Title,
+				UrlHandle = request.UrlHandle,
+				Categories = new List<Category>()
+			};
+
+			foreach (var categoryGuid in request.Categories) 
+			{ 
+				var existingCategory = await categoryRepository.GetByIdAsync(categoryGuid);
+
+				if (existingCategory != null)
+				{
+					blogPost.Categories.Add(existingCategory);
+				}
+			}
+
+			//call repo to update record per domain model
+			var updatedBlogPost = await blogPostRepository.UpdateAsync(blogPost);
+
+			if (updatedBlogPost is null)
+				return NotFound();
+
+			//convert domain model back to dto
+			var response = new BlogPostDTO
+			{
+				Id = blogPost.Id,
+				Author = blogPost.Author,
+				Content = blogPost.Content,
+				DatePublished = blogPost.DatePublished,
+				DateUpdated = blogPost.DateUpdated,
+				FeaturedImageUrl = blogPost.FeaturedImageUrl,
+				IsVisible = blogPost.IsVisible,
+				ShortDescription = blogPost.ShortDescription,
+				Title = blogPost.Title,
+				UrlHandle = blogPost.UrlHandle,
+				Categories = blogPost.Categories.Select(x => new CategoryDTO
+				{
+					Id = x.Id,
+					Name = x.Name,
+					UrlHandle = x.UrlHandle
+				}).ToList()
+			};
+
+			return Ok(response);
+
 		}
 	}
 }

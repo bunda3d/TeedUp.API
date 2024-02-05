@@ -1,8 +1,7 @@
-﻿namespace TeedUp.API.Models.Domain
+﻿namespace TeedUp.API.Models.DTO.BlogPost
 {
-	public class BlogPost
+	public class UpdateBlogPostRequestDTO
 	{
-		public Guid Id { get; set; }
 		public string Title { get; set; }
 		public string ShortDescription { get; set; }
 		public string Content { get; set; }
@@ -13,7 +12,8 @@
 		public string Author { get; set; }
 		public bool IsVisible { get; set; }
 
-		//EF relations
-		public ICollection<Category> Categories { get; set; }
+		//FK Many-To-One relation: Multiple category IDs per blog created or updated
+		public List<Guid> Categories { get; set; } = new List<Guid>();
+		
 	}
 }

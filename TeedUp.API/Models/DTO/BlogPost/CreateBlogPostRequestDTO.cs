@@ -11,5 +11,8 @@
 		public DateTime DateUpdated { get; set; }
 		public string Author { get; set; }
 		public bool IsVisible { get; set; }
+
+		//FK Many-To-One relation: Multiple category IDs per blog created
+		public Guid[] Categories { get; set; }
 	}
 }
