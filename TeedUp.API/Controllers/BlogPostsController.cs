@@ -159,7 +159,7 @@ namespace TeedUp.API.Controllers
 				Author = request.Author,
 				Content = request.Content,
 				DatePublished = request.DatePublished,
-				DateUpdated = request.DateUpdated,
+				DateUpdated = DateTime.UtcNow,
 				FeaturedImageUrl = request.FeaturedImageUrl,
 				IsVisible = request.IsVisible,
 				ShortDescription = request.ShortDescription,
