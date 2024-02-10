@@ -208,5 +208,33 @@ namespace TeedUp.API.Controllers
 			return Ok(response);
 
 		}
+
+		//DELETE: {apibaseurl}/api/blogposts/{id}
+		[HttpDelete]
+		[Route("{id:Guid}")]
+		public async Task<IActionResult> DeleteBlogPost([FromRoute] Guid id)
+		{
+			var deletedBlogPost = await blogPostRepository.DeleteAsync(id);
+
+			if (deletedBlogPost is null) return NotFound();
+
+			//convert domain model to dto
+			var response = new BlogPostDTO
+			{
+				Id = deletedBlogPost.Id,
+				Author = deletedBlogPost.Author,
+				Content = deletedBlogPost.Content,
+				DatePublished = deletedBlogPost.DatePublished,
+				DateUpdated = deletedBlogPost.DateUpdated,
+				FeaturedImageUrl = deletedBlogPost.FeaturedImageUrl,
+				IsVisible = deletedBlogPost.IsVisible,
+				ShortDescription = deletedBlogPost.ShortDescription,
+				Title = deletedBlogPost.Title,
+				UrlHandle = deletedBlogPost.UrlHandle
+			};
+
+			return Ok(response);
+		}
+
 	}
 }
