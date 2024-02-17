@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using TeedUp.API.Data;
 using TeedUp.API.Repositories.Interface;
 using TeedUp.API.Repositories.Service;
@@ -43,6 +44,14 @@ app.UseCors(options =>
 });
 
 app.UseAuthorization();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+	FileProvider = new PhysicalFileProvider(
+		Path.Combine(Directory.GetCurrentDirectory(), "Assets")
+	),
+	RequestPath = "/Assets"
+});
 
 app.MapControllers();
 

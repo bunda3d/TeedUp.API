@@ -16,6 +16,31 @@ namespace TeedUp.API.Controllers
 			this.imageRepository = imageRepository;
 		}
 
+		//GET: {apibaseurl}/api/images
+		[HttpGet]
+		public async Task<IActionResult> GetAllImages()
+		{
+			//get all imgs from repo
+			var images = await imageRepository.GetAll();
+
+			//convert domain model to dto
+			var response = new List<BlogImageDTO>();
+			foreach (var image in images)
+			{
+				response.Add(new BlogImageDTO
+				{
+					Id = image.Id,
+					Title = image.Title,
+					CreatedDate = image.CreatedDate,
+					FileExtension = image.FileExtension,
+					FileName = image.FileName,
+					Url = image.Url
+				});
+			}
+
+			return Ok(response);
+		}
+
 		//POST: {apibaseurl}/api/images
 		[HttpPost]
 		public async Task<IActionResult> UploadImage(
@@ -29,7 +54,7 @@ namespace TeedUp.API.Controllers
 			if (ModelState.IsValid)
 			{
 				//FILE UPLOAD
-				var blogImg = new BlogImage
+				var image = new BlogImage
 				{
 					FileExtension = Path.GetExtension(file.FileName).ToLower(),
 					FileName = fileName,
@@ -37,17 +62,17 @@ namespace TeedUp.API.Controllers
 					CreatedDate = DateTime.Now
 				};
 
-				blogImg = await imageRepository.Upload(file, blogImg);
+				image = await imageRepository.Upload(file, image);
 
 				//convert domain model to dto
 				var response = new BlogImageDTO
 				{
-					Id = blogImg.Id,
-					Title = blogImg.Title,
-					CreatedDate = blogImg.CreatedDate,
-					FileExtension = blogImg.FileExtension,
-					FileName = blogImg.FileName,
-					Url = blogImg.Url
+					Id = image.Id,
+					Title = image.Title,
+					CreatedDate = image.CreatedDate,
+					FileExtension = image.FileExtension,
+					FileName = image.FileName,
+					Url = image.Url
 				};
 
 				return Ok(response);

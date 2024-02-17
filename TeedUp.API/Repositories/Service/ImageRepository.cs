@@ -1,4 +1,5 @@
-﻿using TeedUp.API.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TeedUp.API.Data;
 using TeedUp.API.Models.Domain;
 using TeedUp.API.Repositories.Interface;
 
@@ -21,6 +22,11 @@ namespace TeedUp.API.Repositories.Service
 			this._context = context;
 		}
 
+		public async Task<IEnumerable<BlogImage>> GetAll()
+		{
+			return await _context.BlogImages.ToListAsync();
+		}
+
 		public async Task<BlogImage> Upload(IFormFile file, BlogImage blogImg)
 		{
 			//1.) upload image to api/images
@@ -31,7 +37,7 @@ namespace TeedUp.API.Repositories.Service
 			await file.CopyToAsync(stream);
 
 			//2.) update database
-			//https://{domain}.com/images/somefilename.png
+			//https://{example.com}/images/somefilename.png
 			var httpRequest = _httpCtxtAccessor.HttpContext.Request;
 			var urlPath = $"{httpRequest.Scheme}://{httpRequest.Host}{httpRequest.PathBase}/Assets/Images/{blogImg.FileName}{blogImg.FileExtension}";
 
