@@ -118,10 +118,8 @@ namespace TeedUp.API.Controllers
 			var blogPost = await blogPostRepository.GetByIdAsync(id);
 
 			if (blogPost is null)
-			{
 				return NotFound();
-			}
-			
+
 			//convert domain model to dto
 			var response = new BlogPostDTO
 			{
@@ -144,7 +142,42 @@ namespace TeedUp.API.Controllers
 			};
 
 			return Ok(response);
+		}
 
+		//GET: {apibaseurl}/api/blogposts/{url}
+		[HttpGet]
+		[Route("{urlHandle}")]
+		public async Task<IActionResult> GetBlogPostByUrlHandle([FromRoute] string urlHandle)
+		{
+			var blogPost = await blogPostRepository.GetByUrlHandleAsync(urlHandle);
+
+			if (blogPost is null)
+			{
+				return NotFound();
+			}
+
+			//convert domain model to dto
+			var response = new BlogPostDTO
+			{
+				Id = blogPost.Id,
+				Author = blogPost.Author,
+				Content = blogPost.Content,
+				DatePublished = blogPost.DatePublished,
+				DateUpdated = blogPost.DateUpdated,
+				FeaturedImageUrl = blogPost.FeaturedImageUrl,
+				IsVisible = blogPost.IsVisible,
+				ShortDescription = blogPost.ShortDescription,
+				Title = blogPost.Title,
+				UrlHandle = blogPost.UrlHandle,
+				Categories = blogPost.Categories.Select(x => new CategoryDTO
+				{
+					Id = x.Id,
+					Name = x.Name,
+					UrlHandle = x.UrlHandle
+				}).ToList()
+			};
+
+			return Ok(response);
 		}
 
 		//PUT: {apibaseurl}/api/blogposts/{id}
@@ -168,8 +201,8 @@ namespace TeedUp.API.Controllers
 				Categories = new List<Category>()
 			};
 
-			foreach (var categoryGuid in request.Categories) 
-			{ 
+			foreach (var categoryGuid in request.Categories)
+			{
 				var existingCategory = await categoryRepository.GetByIdAsync(categoryGuid);
 
 				if (existingCategory != null)
@@ -206,7 +239,6 @@ namespace TeedUp.API.Controllers
 			};
 
 			return Ok(response);
-
 		}
 
 		//DELETE: {apibaseurl}/api/blogposts/{id}
@@ -235,6 +267,5 @@ namespace TeedUp.API.Controllers
 
 			return Ok(response);
 		}
-
 	}
 }
